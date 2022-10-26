@@ -1,0 +1,29 @@
+---
+title: "TAILS"
+author: "V. Winter, K. Beatty, M. Stum"
+date: "10/26/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Two Australian Invasive Lethal Species (TAILS)
+cite the authors and article
+
+
+## Map 1: Interactive
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
