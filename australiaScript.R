@@ -21,4 +21,6 @@ catRef <- getMovebankReferenceTable("Feral cat (Felis catus) - Scotia, NSW")
 # https://hansenjohnson.org/post/animate-movement-in-r/
 # https://www.datanovia.com/en/blog/gganimate-how-to-create-plots-with-beautiful-animation-in-r/
 # https://plotly.com/r/
-#   
+
+# Webpage to walkthrough animal vis:
+# https://hansenjohnson.org/post/animate-movement-in-r/
