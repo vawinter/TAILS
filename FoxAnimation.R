@@ -4,6 +4,8 @@
 # Veronica W., Morgan S., Karen B.
 #updated 10/28/2022 - Karen
 
+######    PROBLEMS noted in lines 32 and 47
+
 library(move)
 library(tidyverse)
 library(lubridate)
@@ -27,7 +29,7 @@ subFox <- fox[[foxList]]
 subFox <- subFox[year(timestamps(subFox)) == 2017]
 
 # Confirm timestamps and ids in specified range
-range(timestamps(subFox))
+range(timestamps(subFox)) #    PROBLEM :: time range 7/31-11/21
 unique(subFox@idData$local_identifier)
 
 # Resample data to 12-hr intervals and align times for matching sequenced animation
@@ -42,7 +44,7 @@ colChoice <- brewer.pal(n = 9, name= 'Set1')
 view_spatial(moveFox, path_colours = colChoice, )
 
 # Create animated movement path
-framesFox <- frames_spatial(moveFox, path_colours = colChoice, tail_colour = colChoice, 
+framesFox <- frames_spatial(moveFox, path_colours = colChoice, tail_colour = colChoice, #   PROBLEM :: each path is multi-color - related to the palette call or tail_colour() ?
                             map_service = 'osm', map_type = 'terrain',
                             alpha = 0.5) %>% 
   add_labels(x = "Longitude", y = "Latitude") %>%
