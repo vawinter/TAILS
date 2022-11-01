@@ -23,6 +23,11 @@ communicate their movement patterns and home range sizes in a comparative framew
 statistical analyses.
 
 
+## Home ranges
+Home ranges are a great way to start to visualize areas being used by individuals.
+Here, we created minium convex polygons (MCP) and kernel density estimators (KDE) for
+three cats and three foxes in from August - Novemeber in 2017
+
 ## Visualization 1a: Home ranges: Cats
 ```{r}
 # Creating home ranges for cats
@@ -242,7 +247,8 @@ plot(fox_kde[[2]], main = "KDE: Flo", col = "darkorange")
 plot(fox_kde[[3]], main = "KDE: Joy", col = "brown3")
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
-
 # TO add:
-- 
+- interactive map
+- change map extent
+- cahnge tail color by group
+- Next steps/what we werent able to do
