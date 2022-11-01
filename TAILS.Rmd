@@ -1,5 +1,5 @@
 ---
-title: "TAILS"
+title: "T.A.I.L.S: Animal movement visualization"
 author: "V. Winter, K. Beatty, M. Stum"
 date: "10/26/2022"
 output: html_document
@@ -9,13 +9,134 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+## Animal movement visualization
+
+For our project, we wanted to test different methods and packages to visualize animal
+movement data. Specifically, we wanted to figure out the best way to create
+maps and plots to best represent GPS data.
+
 ## Two Australian Invasive Lethal Species (TAILS)
-cite the authors and article
+We wanted to utilize data that was collected and uploaded to Movebank to familiarize 
+ourselves with that platform. We found a unique data set of GPS collared feral cats and
+European foxes in Australia. These mammals are both invasive to the area. We wanted to 
+communicate their movement patterns and home range sizes in a comparative framework without
+statistical analyses.
 
 
-## Map 1: Interactive
-```{r cars}
-summary(cars)
+## Map 1: Home ranges: Cats
+```{r}
+# Creating home ranges for cats
+
+# Read in libraries ----
+library(dplyr)
+library(lubridate)
+library(amt)
+
+# Read in data ----
+# Cat GPS data and reference data
+x <- read.csv("Data/Feral cat (Felis catus) - Scotia, NSW-reference-data.csv")
+cat <- read.csv("Data/Feral cat (Felis catus) - Scotia, NSW.csv")
+
+# Prepare the data ----
+# Filter individuals in 2017 with greater than 600 data pints
+cat_choice <- cat %>% 
+  filter(year(timestamp) %in% 2017) %>% 
+  group_by(individual.local.identifier) %>% 
+  summarise(n = length(location.long)) %>% 
+  filter(n >= 600) 
+  
+# Filter individuals in reference file to see metadata
+cat_check <- x %>% 
+  filter(animal.id %in% cat_choice$individual.local.identifier) 
+
+# visualize in table the cats per year
+table(x$animal.id, x$animal.sex, year(x$deploy.on.date))  
+
+# Grab sex from reference data
+sex <- x %>% 
+  select(animal.id,
+         animal.sex)
+
+# Okay, not lets do some renaming
+cat_choice <- cat %>% 
+  filter(year(timestamp) %in% 2017) %>% 
+  # select cols and rename
+  select(animal.id = individual.local.identifier,
+         y = location.lat,
+         x = location.long,
+         utm.y = utm.easting,
+         utm.x = utm.northing,
+         utm.zone,
+         dt = timestamp) %>% 
+  # join with ref data
+  left_join(sex, by = "animal.id") %>% 
+  # rename again
+  rename(sex = animal.sex,
+         id = animal.id) %>% 
+  # filter time
+  filter(hour(dt) %in% c(0, 6, 12, 18),
+         month(dt) %in% 8:11) %>% 
+  # change class of col
+  mutate(x = as.numeric(x),
+         y = as.numeric(y),
+         dt = as.Date(dt)) %>% 
+  # arrange asc date and time
+  arrange(dt)
+
+
+# Home range analysis:
+# Make track for hr analysis
+cat_track <- mk_track(tbl = cat_choice, .x = x, .y = y, .t = dt, 
+                      id = id, crs = 23884)
+
+
+# create hrs per cat
+cat <- unique(cat_choice$id)
+cat_mcp <- list()
+cat_kde <- list()
+
+# loop
+for(i in 1:length(cat)){
+  x <- cat_track %>% 
+    filter(id == cat[i]) 
+  
+    cat_mcp[[i]] <- hr_mcp(x = x, 
+                    levels = c(0.95, 0.5), 
+                    keep.data = TRUE)
+    
+    # Fit KDE
+    cat_kde[[i]] <- hr_kde(x = x,
+                       levels = c(0.95, 0.5),
+                       keep.data = TRUE,
+                       h = hr_kde_ref(x), #default
+                       trast = make_trast(x))
+    
+
+}
+
+# name the list elements
+names(cat_kde) <- names(cat_mcp) <- cat
+
+# plot: minimum convex Polygon for 3 cats August - November 2017
+plot(cat_mcp[[1]], main = "MCP: Ben")
+plot(cat_mcp[[2]], main = "MCP: Ivy")
+plot(cat_mcp[[3]], main = "MCP: Ken")
+
+# plot: Kernel density Estimates for 3 cats August - November 2017
+plot(cat_kde[[1]], main = "KDE: Ben")
+plot(cat_kde[[2]], main = "KDE: Ivy")
+plot(cat_kde[[3]], main = "KDE: Ken")
+
+
+# To extract the areas from all MCPs
+mcp_areas <- lapply(cat_mcp, hr_area)
+kde_areas <- lapply(cat_kde, hr_area)
+
+kde_df <- bind_rows(kde_areas, .id = "id")
+mcp_df <- bind_rows(mcp_areas, .id = "id")
+
+
+
 ```
 
 ## Including Plots
@@ -23,7 +144,103 @@ summary(cars)
 You can also embed plots, for example:
 
 ```{r pressure, echo=FALSE}
-plot(pressure)
+# Creating home ranges for foxs
+library(dplyr)
+library(lubridate)
+library(amt)
+
+# Read in data ----
+# fox data and reference
+x <- read.csv("Data/Red Fox (Vulpes vulpes) - Scotia, NSW, Australia-reference-data.csv")
+x
+fox <- read.csv("Data/Red Fox (Vulpes vulpes) - Scotia, NSW, Australia.csv")
+
+# Filter individuals in 2017 with greater than 600 data pints
+fox_choice <- fox %>% 
+  filter(year(timestamp) %in% 2016) %>% 
+  group_by(individual.local.identifier) %>% 
+  summarise(n = length(location.long)) %>% 
+  filter(n >= 600) 
+
+# Filter individuals in reference file to see metadata
+fox_check <- x %>% 
+  filter(animal.id %in% fox_choice$individual.local.identifier) 
+
+# visualize in table
+table(x$animal.id, x$animal.sex, year(x$deploy.on.date))  
+
+# Grab sex from reference data
+sex <- x %>% 
+  select(animal.id,
+         animal.sex)
+
+# Okay, not lets do some renaming
+fox_choice <- fox %>% 
+  filter(year(timestamp) %in% 2017) %>% 
+  # select cols and rename
+  select(animal.id = individual.local.identifier,
+         y = location.lat,
+         x = location.long,
+         utm.y = utm.easting,
+         utm.x = utm.northing,
+         utm.zone,
+         dt = timestamp) %>% 
+  # join with ref data
+  left_join(sex, by = "animal.id") %>% 
+  # rename again
+  rename(sex = animal.sex,
+         id = animal.id) %>% 
+  # filter time
+  filter(hour(dt) %in% c(0, 6, 12, 18),
+         month(dt) %in% 8:11) %>% 
+  # change class of col
+  mutate(x = as.numeric(x),
+         y = as.numeric(y),
+         dt = as.Date(dt)) %>% 
+  # arrange asc date and time
+  arrange(dt)
+
+# make track for hr analysis
+fox_track <- mk_track(tbl = fox_choice, .x = x, .y = y, .t = dt, 
+                      id = id, crs = 23884)
+
+
+# create hrs per fox
+fox <- unique(fox_choice$id)
+fox_mcp <- list()
+fox_kde <- list()
+
+# loop
+for(i in 1:length(fox)){
+  x <- fox_track %>% 
+    filter(id == fox[i]) 
+  
+  fox_mcp[[i]] <- hr_mcp(x = x, 
+                         levels = c(0.95, 0.5), 
+                         keep.data = TRUE)
+  
+  # Fit KDE
+  fox_kde[[i]] <- hr_kde(x = x,
+                         levels = c(0.95, 0.5),
+                         keep.data = TRUE,
+                         h = hr_kde_ref(x), #default
+                         trast = make_trast(x))
+  
+  
+}
+
+# name the list elements
+names(fox_kde) <- names(fox_mcp) <- fox
+
+# plot: MCP
+plot(fox_mcp[[1]], main = "MCP: Ros")
+plot(fox_mcp[[2]], main = "MCP: Flo")
+plot(fox_mcp[[3]], main = "MCP: Joy")
+
+# plot: KDE
+plot(fox_kde[[1]], main = "KDE: Ros")
+plot(fox_kde[[2]], main = "KDE: Flo")
+plot(fox_kde[[3]], main = "KDE: Joy")
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
