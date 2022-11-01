@@ -4,8 +4,6 @@
 # Veronica W., Morgan S., Karen B.
 #updated 10/28/2022 - Karen
 
-######    PROBLEMS noted in lines 32 and 47
-
 library(move)
 library(tidyverse)
 library(lubridate)
@@ -34,7 +32,7 @@ subFox <- subFox[month(timestamps(subFox)) %in% c(8, 9, 10, 11)]
 range(timestamps(subFox)) #    PROBLEM :: time range 7/31-11/21
 unique(subFox@idData$local_identifier)
 
-# Resample data to 12-hr intervals and align times for matching sequenced animation
+# Resample data to 6-hr intervals and align times for matching sequenced animation
 head(timeLag(subFox, unit = "mins"), n=2) #check timestamp intervals; currently 20 mins
 moveFox <- align_move(subFox, res = 6, unit = "hours")
 
