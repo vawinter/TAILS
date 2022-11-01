@@ -244,5 +244,71 @@ plot(fox_kde[[3]], main = "KDE: Joy", col = "brown3")
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
+#Movement visualization for cats
+```{r}
+library(tidyverse)
+library(lubridate)
+library(move)
+library(moveVis)
+library(RColorBrewer)
+library(leaflet)
+
+#load cat data from Movebank as Movestack
+# crete 'login'
+loginStored <- movebankLogin(username="mbstum", password="Cq6j9m4KrQRQGJ@")
+cats <- getMovebankData("Feral cat (Felis catus) - Scotia, NSW", login = loginStored, includeExtraSensors = TRUE)
+# https://cran.r-project.org/web/packages/move/index.html
+#username: mbstum
+#password: Cq6j9m4KrQRQGJ@
+
+#subsetting cats dataset as a Movestack object
+#visual data exploration to chose cats with the most gps fixes within a similar time period
+#subset cats for only Aug - Nov 2017
+
+#list of cats to use
+cat_list <- c("Ben_MC236", "Ivy_FC489", "Ken_MC536", "Ray_MC729", "Roy_MC769" )
+
+#subset movestack by cat names
+subcats <- cats[[cat_list]]
+
+#subset movestack by year
+subcats <- subcats[year(timestamps(subcats))==2017] 
+
+#subset movestack by months aug - nov
+subcats <- subcats[month(timestamps(subcats))%in% c(8,9,10,11)]
+
+#check timestamps
+min(timestamps(subcats))
+max(timestamps(subcats))
+
+# align data to a uniform time scale, resample 4x daily
+#reduces frames of movement animation to a resonable time
+mC <- align_move(subcats, res = 6, unit = "hours")
+
+#colors for movement tracks
+col = brewer.pal(n = 5, name = "Set2")
+
+# create spatial frames with a OpenStreetMap 
+frames <- frames_spatial(mC, path_colours = col,
+                         tail_colour = "white", tail_size = 0.8, #how to include tail
+                         trace_show = TRUE, trace_colour = "darkgray", #how to include path trace
+                         map_service = 'osm', map_type = "terrain",
+                         alpha = 0.5) %>% 
+  add_labels(x = "Longitude", y = "Latitude") %>% # add some customizations, such as axis labels
+  add_northarrow() %>% 
+  add_scalebar() %>% 
+  add_timestamps(type = "label") %>% 
+  add_progress()
+
+frames[[100]] # preview one of the frames, e.g. the 100th frame
+```
+#individual locations on an interactive leaflet map
+```{r}
+view_spatial(mC, path_colours = col, render_as = "leaflet")
+```
+#animate the movement paths into a GIF
+```{r}
+animate_frames(frames, out_file = "catVis.gif", overwrite = TRUE)
+```
 # TO add:
 - 
