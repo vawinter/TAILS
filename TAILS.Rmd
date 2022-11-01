@@ -23,7 +23,7 @@ communicate their movement patterns and home range sizes in a comparative framew
 statistical analyses.
 
 
-## Map 1: Home ranges: Cats
+## Visualization 1a: Home ranges: Cats
 ```{r}
 # Creating home ranges for cats
 
@@ -118,14 +118,14 @@ for(i in 1:length(cat)){
 names(cat_kde) <- names(cat_mcp) <- cat
 
 # plot: minimum convex Polygon for 3 cats August - November 2017
-plot(cat_mcp[[1]], main = "MCP: Ben")
-plot(cat_mcp[[2]], main = "MCP: Ivy")
-plot(cat_mcp[[3]], main = "MCP: Ken")
+plot(cat_mcp[[1]], main = "MCP: Ben", col = "coral")
+plot(cat_mcp[[2]], main = "MCP: Ivy", col = "lightblue")
+plot(cat_mcp[[3]], main = "MCP: Ken", col = "darkolivegreen3")
 
 # plot: Kernel density Estimates for 3 cats August - November 2017
-plot(cat_kde[[1]], main = "KDE: Ben")
-plot(cat_kde[[2]], main = "KDE: Ivy")
-plot(cat_kde[[3]], main = "KDE: Ken")
+plot(cat_kde[[1]], main = "KDE: Ben", col = "coral")
+plot(cat_kde[[2]], main = "KDE: Ivy", col = "lightblue")
+plot(cat_kde[[3]], main = "KDE: Ken", col = "darkolivegreen3")
 
 
 # To extract the areas from all MCPs
@@ -139,9 +139,8 @@ mcp_df <- bind_rows(mcp_areas, .id = "id")
 
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
+## Visualization 1b: Home ranges: Foxes
 
 ```{r pressure, echo=FALSE}
 # Creating home ranges for foxs
@@ -233,14 +232,17 @@ for(i in 1:length(fox)){
 names(fox_kde) <- names(fox_mcp) <- fox
 
 # plot: MCP
-plot(fox_mcp[[1]], main = "MCP: Ros")
-plot(fox_mcp[[2]], main = "MCP: Flo")
-plot(fox_mcp[[3]], main = "MCP: Joy")
+plot(fox_mcp[[1]], main = "MCP: Ros", col = "aquamarine3")
+plot(fox_mcp[[2]], main = "MCP: Flo", col = "darkorange")
+plot(fox_mcp[[3]], main = "MCP: Joy", col = "brown3")
 
 # plot: KDE
-plot(fox_kde[[1]], main = "KDE: Ros")
-plot(fox_kde[[2]], main = "KDE: Flo")
-plot(fox_kde[[3]], main = "KDE: Joy")
+plot(fox_kde[[1]], main = "KDE: Ros", col = "aquamarine3")
+plot(fox_kde[[2]], main = "KDE: Flo", col = "darkorange")
+plot(fox_kde[[3]], main = "KDE: Joy", col = "brown3")
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+# TO add:
+- 
