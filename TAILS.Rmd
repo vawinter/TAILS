@@ -25,7 +25,7 @@ statistical analyses.
 
 ## Home ranges
 Home ranges are a great way to start to visualize areas being used by individuals.
-Here, we created minium convex polygons (MCP) and kernel density estimators (KDE) for
+Here, we created minimum convex polygons (MCP) and kernel density estimators (KDE) for
 three cats and three foxes in from August - November in 2017
 
 ## Visualization 1a: Home ranges: Cats
@@ -250,7 +250,12 @@ plot(fox_kde[[3]], main = "KDE: Joy", col = "brown3")
 <<<<<<< HEAD
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
-#Movement visualization for cats
+
+##Movetrack visualization: cats
+Now that we can see static homeranges to visualize size and shape variance, we wanted to explore animating
+the GPS location points to trace the movements of individuals and plot them on a map.
+The package we used is called moveVis, which requires the data to be formatted as a "movestack" object. 
+
 ```{r}
 library(tidyverse)
 library(lubridate)
@@ -260,12 +265,10 @@ library(RColorBrewer)
 library(leaflet)
 
 #load cat data from Movebank as Movestack
-# crete 'login'
+# create 'login'
 loginStored <- movebankLogin(username="mbstum", password="Cq6j9m4KrQRQGJ@")
 cats <- getMovebankData("Feral cat (Felis catus) - Scotia, NSW", login = loginStored, includeExtraSensors = TRUE)
 # https://cran.r-project.org/web/packages/move/index.html
-#username: mbstum
-#password: Cq6j9m4KrQRQGJ@
 
 #subsetting cats dataset as a Movestack object
 #visual data exploration to chose cats with the most gps fixes within a similar time period
@@ -290,11 +293,23 @@ max(timestamps(subcats))
 # align data to a uniform time scale, resample 4x daily
 #reduces frames of movement animation to a resonable time
 mC <- align_move(subcats, res = 6, unit = "hours")
+```
 
+##Interactive location maps
+Before creating an animation, you can view all the location points for each individual
+on an interactive map, which allows you to zoom in/out and hover over each point to view information.
+
+```{r}
+view_spatial(mC, path_colours = col, render_as = "leaflet")
+```
+
+##Finally, animate the movement paths into a GIF
+
+```{r}
 #colors for movement tracks
 col = brewer.pal(n = 5, name = "Set2")
 
-# create spatial frames with a OpenStreetMap 
+# create spatial frames with a basemap 
 frames <- frames_spatial(mC, path_colours = col,
                          tail_colour = "white", tail_size = 0.8, #how to include tail
                          trace_show = TRUE, trace_colour = "darkgray", #how to include path trace
@@ -307,18 +322,13 @@ frames <- frames_spatial(mC, path_colours = col,
   add_progress()
 
 frames[[100]] # preview one of the frames, e.g. the 100th frame
-```
-#individual locations on an interactive leaflet map
-```{r}
-view_spatial(mC, path_colours = col, render_as = "leaflet")
-```
-#animate the movement paths into a GIF
-```{r}
+
 animate_frames(frames, out_file = "catVis.gif", overwrite = TRUE)
 ```
 
-# TO add:
+## TO add:
 - interactive map
 - change map extent
-- cahnge tail color by group
-- Next steps/what we werent able to do
+- change tail color by group
+- Next steps/what we weren't able to do
+- Merge fox and cat movestack to plot both movetracks grouped by species on the same basemap animation
