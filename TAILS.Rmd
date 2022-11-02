@@ -1,6 +1,6 @@
 ---
 title: "T.A.I.L.S: Animal movement visualization"
-author: "K. Beatty, M. Stum, & V. Winter, "
+author: "K. Beatty, M. Stum, & V. Winter"
 date: "11/01/2022"
 output: html_document
 ---
@@ -442,7 +442,7 @@ There were several customizations and visual integrations we hoped to accomplish
 3. Similarly, we wanted to combine the fox and cat movement paths into a single animated map, grouped by species. We encountered difficulties with this goal because the movestack data class can be difficult to manipulate. We have not determined if combining the data sets for a single animated map is impossible in the moveVis package, but we were not able to complete our attempt.
 
 
-###Citations
+## Citations
 Roshier DA, Carter A (2021) Data from: Space use and interactions of two introduced mesopredators, European red fox and feral cat, in an arid landscape. Movebank Data Repository. doi:10.5441/001/1.6m6h9s33
 
 Roshier DA, Carter A. 2021. Space use and interactions of two introduced mesopredators, European red fox and feral cat, in an arid landscape. Ecosphere. 12(7):e03628. doi:10.1002/ecs2.3628
