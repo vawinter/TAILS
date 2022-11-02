@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 For our project, we wanted to test different methods and packages to visualize animal
 movement data. Specifically, we wanted to figure out the best way to create
-maps and plots to best represent GPS data.
+maps and plots to display GPS data.
 
 ## Two Australian Invasive Lethal Species (TAILS)
 We wanted to utilize data that was collected and uploaded to Movebank to familiarize 
@@ -24,9 +24,9 @@ statistical analyses.
 
 
 ## Home ranges
-Home ranges are a great way to start to visualize areas being used by individuals.
+Home ranges are a great way to visualize the boundaries of areas being used by individuals.
 Here, we created minimum convex polygons (MCP) and kernel density estimators (KDE) for
-three cats and three foxes in from August - November in 2017
+three cats and three foxes from August through November in 2017.
 
 ## Visualization 1a: Home ranges: Cats
 ```{r}
@@ -252,8 +252,7 @@ Note that the `echo = FALSE` parameter was added to the code chunk to prevent pr
 
 
 ##Movetrack visualization: cats
-Now that we can see static homeranges to visualize size and shape variance, we wanted to explore animating
-the GPS location points to trace the movements of individuals and plot them on a map.
+Now that we can see static home ranges to visualize size and shape variance, we wanted to explore animating the GPS location points to trace the movements of individuals and plot them on a map.
 The package we used is called moveVis, which requires the data to be formatted as a "movestack" object. 
 
 ```{r}
@@ -327,9 +326,73 @@ frames[[100]] # preview one of the frames, e.g. the 100th frame
 animate_frames(frames, out_file = "catVis.gif", overwrite = TRUE)
 ```
 
-## TO add:
-- interactive map
-- change map extent
-- change tail color by group
-- Next steps/what we weren't able to do
-- Merge fox and cat movestack to plot both movetracks grouped by species on the same basemap animation
+## Movetrack visualization: foxes
+We also created an interactive map of the fox locations and an animated path of the fox movement during the same time period as the cats.
+
+Notice that with the moveVis package we are able to customize point and line colors, and map imagery.
+```{r, echo = FALSE}
+# Load fox data & reference file directly from MoveBank
+fox <- getMovebankData("Red Fox (Vulpes vulpes) - Scotia, NSW, Australia", includeExtraSensors = TRUE)
+foxRef <- getMovebankReferenceTable("Red Fox (Vulpes vulpes) - Scotia, NSW, Australia")
+
+# Filter data set to only individuals with observations in Aug-Nov 2017
+foxChoice <- fox %>%
+  as.data.frame() %>%
+  filter(timestamp >= "2017-08-01", timestamp < "2018-12-01") %>% 
+  group_by(local_identifier) %>% 
+  summarise(n = length(location_long)) %>% 
+  print() # aiming for inds w/ > 730 locs; all inds fit this qualification
+foxList <- foxChoice$local_identifier
+subFox <- fox[[foxList]]
+subFox <- subFox[year(timestamps(subFox)) == 2017]
+subFox <- subFox[month(timestamps(subFox)) %in% c(8, 9, 10, 11)]
+
+# Confirm timestamps and ids in specified range
+# range(timestamps(subFox))
+# unique(subFox@idData$local_identifier)
+
+# Resample data to 6-hr intervals and align times for matching sequenced animation
+# head(timeLag(subFox, unit = "mins"), n=2) #check timestamp intervals; currently 20 mins
+moveFox <- align_move(subFox, res = 6, unit = "hours")
+
+# Set colors for individual locations/movement path
+colChoice <- brewer.pal(n = 9, name= 'Set1')
+
+# Display locations on interactive map
+view_spatial(moveFox, path_colours = colChoice)
+
+# Create animated movement path
+framesFox <- frames_spatial(moveFox, path_colours = colChoice, # Can't figure out how to match tail colour to path colour by individual; error message indicates it's not possible
+                            trace_show = TRUE, trace_colour = 'darkgrey',
+                            map_service = 'osm', map_type = 'watercolor',
+                            alpha = 0.5) %>% 
+  add_labels(x = "Longitude", y = "Latitude") %>%
+  add_northarrow() %>%
+  add_scalebar() %>%
+  add_timestamps(type = "label") %>%
+  add_progress()
+  # %>% add_gg(gg = expr(list(xlim(c(140.0, 142.0)), ylim(c(-30.0, -34.0))))) # Can't figure out how to manually change the map extent; should be able to use add_gg() to call a ggplot2 function within moveVis
+animate_frames(framesFox, out_file = "foxVis.gif")
+```
+
+## Lessons Learned
+The moveVis package works exclusively with objects of class 'movestack.' While the package is supposed to allow easy conversion from a data frame to a movestack object, we were not able to successfully make this conversion within moveVis. We resorted to downloading the data directly from Movebank, which requires creating an account and accepting data use terms on the website first. This is not to say converting from a data frame is impossible, but this could make it more difficult for people to use moveVis if they are not housing their GPS data on Movebank.
+
+There are large differences in processing time of the animated map depending on the frequency of location fixes. For example, 2 years of data at 20 minute fixes took several orders of magnitude longer (2 hours) to process than 6 months of data at 6 hour fixes (5 minutes).
+
+Overall, it was quick to get started with the moveVis package, and fairly easy to get a basic map or gif created.
+
+## Other Visualization Tools
+We investigated several other interactive mapping tools.
+
+Leaflet and Mapview are utilized by the moveVis package, so the interactive maps created within moveVis are technically Leaflet maps. However, it is possible to customize interactive maps using Leaflet or Mapview directly. The customization process is very similar to ggplot2, and there are plentiful helpful resources online (https://rstudio.github.io/leaflet/).
+
+Plotly is a commonly used package to upgrade a traditional ggplot to an interactive plot. This can be used for non-spatial data, too! 
+
+A package called DynamoVIS (https://dynamovis.geog.ucsb.edu/index) serves a similar purpose as moveVis, but it is not housed on CRAN and it must be downloaded from GitHub. The capabilities appear to be greater than moveVis, but it likely requires more effort from the user.
+
+## Next Steps
+There were several customizations and visual integrations we hoped to accomplish with moveVis, but were not able to complete. 
+1. We attempted to set the path ("tail") colors equal to the animated line, unique to each individual. It seems the package only allows a single parameter value for the tail color, but this is something we could explore further.
+2. There is a function in moveVis that allows animated maps to play side-by-side, which would create a useful visualization. There are some underlying steps to align the maps properly, and we simply ran out of time to attempt this mapping feature.
+3. Similarly, we wanted to combine the fox and cat movement paths into a single animated map, grouped by species. We encountered difficulties with this goal because the movestack data class can be difficult to manipulate. We have not determined if combining the data sets for a single animated map is impossible in the moveVis package, but we were not able to complete our attempt.
