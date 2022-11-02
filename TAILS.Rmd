@@ -272,7 +272,7 @@ hist(f_kde_df$area, main = "KDE: Fox home range area distribution", col = "pink"
 ```
 
 
-##Movetrack visualization: cats
+## Movetrack visualization: cats
 Now that we can see static home ranges to visualize size and shape variance, we wanted to explore animating the GPS location points to trace the movements of individuals and plot them on a map.
 The package we used is called moveVis, which requires the data to be formatted as a "movestack" object. 
 
@@ -315,7 +315,7 @@ max(timestamps(subcats))
 mC <- align_move(subcats, res = 6, unit = "hours")
 ```
 
-##Interactive location maps
+## Interactive location maps
 Before creating an animation, you can view all the location points for each individual
 on an interactive map, which allows you to zoom in/out and hover over each point to view information.
 
@@ -327,7 +327,7 @@ col = brewer.pal(n = 5, name = "Set2")
 view_spatial(mC, path_colours = col, render_as = "leaflet")
 ```
 
-##Finally, animate the movement paths into a GIF
+## Finally, animate the movement paths into a GIF
 
 ```{r, eval=FALSE, echo=TRUE}
 # create spatial frames with a basemap 
