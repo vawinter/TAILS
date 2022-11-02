@@ -1,3 +1,6 @@
+rm(list = ls())
+gc()
+
 # Creating home ranges for cats
 library(dplyr)
 library(lubridate)
@@ -46,7 +49,7 @@ cat_choice <- cat %>%
          id = animal.id) %>% 
   # filter time
   filter(hour(dt) %in% c(0, 6, 12, 18),
-         month(dt) %in% 2:6) %>% 
+         month(dt) %in% 8:11) %>% 
   # change class of col
   mutate(x = as.numeric(x),
          y = as.numeric(y),
@@ -87,7 +90,7 @@ for(i in 1:length(cat)){
 names(cat_kde) <- names(cat_mcp) <- cat
 
 # plot
-plot(cat_kde[[1]])
+plot(cat_kde[[3]], main = "Ken")
 
 # To extract the areas from all MCPs
 mcp_areas <- lapply(cat_mcp, hr_area)
@@ -96,7 +99,8 @@ kde_areas <- lapply(cat_kde, hr_area)
 kde_df <- bind_rows(kde_areas, .id = "id")
 mcp_df <- bind_rows(mcp_areas, .id = "id")
 
-#saveRDS(cat_choice, "Data/20221028_cat-data.rds")
+saveRDS(cat_kde, "DataVis/20221031_cat-kde.rds")
+saveRDS(kde_df, "DataVis/20221031_cat_hr-df.rds")
 
   
   

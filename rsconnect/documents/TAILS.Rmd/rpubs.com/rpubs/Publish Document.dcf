@@ -1,0 +1,11 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/964776/62947263449f49aca59ee5e52c20ebf3
+bundleId: https://api.rpubs.com/api/v1/document/964776/62947263449f49aca59ee5e52c20ebf3
+url: http://rpubs.com/vermanica/964776
+when: 1667323802.3869
+lastSyncTime: 1667323802.3869

@@ -33,7 +33,7 @@ sex <- x %>%
 
 # Okay, not lets do some renaming
 fox_choice <- fox %>% 
-  filter(year(timestamp) %in% 2016) %>% 
+  filter(year(timestamp) %in% 2017) %>% 
   # select cols and rename
   select(animal.id = individual.local.identifier,
          y = location.lat,
@@ -49,7 +49,7 @@ fox_choice <- fox %>%
          id = animal.id) %>% 
   # filter time
   filter(hour(dt) %in% c(0, 6, 12, 18),
-         month(dt) %in% 2:6) %>% 
+         month(dt) %in% 8:11) %>% 
   # change class of col
   mutate(x = as.numeric(x),
          y = as.numeric(y),
@@ -90,7 +90,7 @@ for(i in 1:length(fox)){
 names(fox_kde) <- names(fox_mcp) <- fox
 
 # plot
-plot(fox_kde[[1]])
+plot(fox_kde[[3]], col = "lightgreen")
 
 # To extract the areas from all MCPs
 mcp_areas <- lapply(fox_mcp, hr_area)
@@ -99,4 +99,9 @@ kde_areas <- lapply(fox_kde, hr_area)
 kde_df <- bind_rows(kde_areas, .id = "id")
 mcp_df <- bind_rows(mcp_areas, .id = "id")
 
-#saveRDS(fox_choice, "Data/20221028_fox-data.rds")
+saveRDS(fox_kde, "DataVis/20221031_fox-kde.rds")
+saveRDS(kde_df, "DataVis/20221031_fox_hr-df.rds")
+
+# overlap
+d <- hr_overlap(cat_kde[[1]], fox_kde[[1]])
+plot(fox_kde[[1]])
