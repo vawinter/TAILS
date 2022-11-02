@@ -1,6 +1,6 @@
 ---
 title: "T.A.I.L.S: Animal movement visualization"
-author: "V. Winter, K. Beatty, M. Stum"
+author: "K. Beatty, M. Stum, & V. Winter, "
 date: "11/01/2022"
 output: html_document
 ---
@@ -18,15 +18,15 @@ maps and plots to display GPS data.
 ## Two Australian Invasive Lethal Species (TAILS)
 We wanted to utilize data that was collected and uploaded to Movebank to familiarize 
 ourselves with that platform. We found a unique data set of GPS collared feral cats and
-European foxes in Australia. These mammals are both invasive to the area. We wanted to 
+European red foxes in Australia. These mammals are both invasive to the area. We wanted to 
 communicate their movement patterns and home range sizes in a comparative framework without
 statistical analyses.
 
 
 ## Home ranges
-Home ranges are a great way to visualize the boundaries of areas being used by individuals.
+Although we wanted to largely stya away from statistics, some tools are a useful way to visualize differenes in the boundaries of areas being used by individuals.
 Here, we created minimum convex polygons (MCP) and kernel density estimators (KDE) for
-three cats and three foxes from August through November in 2017.
+three cats and three foxes from August through November in 2017. We wanted to also see if the size of the area the individuals used differed.
 
 ## Visualization 1a: Home ranges: Cats
 ```{r}
@@ -137,9 +137,8 @@ plot(cat_kde[[3]], main = "KDE: Ken", col = "darkolivegreen3")
 mcp_areas <- lapply(cat_mcp, hr_area)
 kde_areas <- lapply(cat_kde, hr_area)
 
-kde_df <- bind_rows(kde_areas, .id = "id")
-mcp_df <- bind_rows(mcp_areas, .id = "id")
-
+c_kde_df <- bind_rows(kde_areas, .id = "id")
+c_mcp_df <- bind_rows(mcp_areas, .id = "id")
 
 
 ```
@@ -236,6 +235,13 @@ for(i in 1:length(fox)){
 # name the list elements
 names(fox_kde) <- names(fox_mcp) <- fox
 
+# To extract the areas from all MCPs
+mcp_areas <- lapply(fox_mcp, hr_area)
+kde_areas <- lapply(fox_kde, hr_area)
+
+f_kde_df <- bind_rows(kde_areas, .id = "id")
+f_mcp_df <- bind_rows(mcp_areas, .id = "id")
+
 # plot: MCP
 plot(fox_mcp[[1]], main = "MCP: Ros", col = "aquamarine3")
 plot(fox_mcp[[2]], main = "MCP: Flo", col = "darkorange")
@@ -245,10 +251,24 @@ plot(fox_mcp[[3]], main = "MCP: Joy", col = "brown3")
 plot(fox_kde[[1]], main = "KDE: Ros", col = "aquamarine3")
 plot(fox_kde[[2]], main = "KDE: Flo", col = "darkorange")
 plot(fox_kde[[3]], main = "KDE: Joy", col = "brown3")
+
 ```
 
-<<<<<<< HEAD
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+## Home range area comparison
+```{r}
+hist(c_mcp_df$area, main = "MCP: Cat home range area distribution", col = "lightgreen",
+     xlab = "Area")
+hist(c_kde_df$area, main = "KDE: Cat home range area distribution", col = "cyan",
+     xlab = "Area")
+
+hist(f_mcp_df$area, main = "MCP: Fox home range area distribution", col = "goldenrod",
+     xlab = "Area")
+hist(f_kde_df$area, main = "KDE: Fox home range area distribution", col = "pink",
+     xlab = "Area")
+
+
+```
 
 
 ##Movetrack visualization: cats
@@ -331,9 +351,13 @@ We also created an interactive map of the fox locations and an animated path of 
 
 Notice that with the moveVis package we are able to customize point and line colors, and map imagery.
 ```{r, echo = FALSE}
+# set up loin for movebank
+loginStored <- movebankLogin(username="mbstum", password="Cq6j9m4KrQRQGJ@")
+
 # Load fox data & reference file directly from MoveBank
-fox <- getMovebankData("Red Fox (Vulpes vulpes) - Scotia, NSW, Australia", includeExtraSensors = TRUE)
-foxRef <- getMovebankReferenceTable("Red Fox (Vulpes vulpes) - Scotia, NSW, Australia")
+fox <- getMovebankData("Red Fox (Vulpes vulpes) - Scotia, NSW, Australia", login = loginStored, includeExtraSensors = TRUE)
+foxRef <- getMovebankReferenceTable("Red Fox (Vulpes vulpes) - Scotia, NSW, Australia",
+                                    login = loginStored)
 
 # Filter data set to only individuals with observations in Aug-Nov 2017
 foxChoice <- fox %>%
@@ -372,7 +396,7 @@ framesFox <- frames_spatial(moveFox, path_colours = colChoice, # Can't figure ou
   add_timestamps(type = "label") %>%
   add_progress()
   # %>% add_gg(gg = expr(list(xlim(c(140.0, 142.0)), ylim(c(-30.0, -34.0))))) # Can't figure out how to manually change the map extent; should be able to use add_gg() to call a ggplot2 function within moveVis
-animate_frames(framesFox, out_file = "foxVis.gif")
+animate_frames(framesFox, out_file = "foxVis.gif", overwrite = TRUE)
 ```
 
 ## Lessons Learned
@@ -396,3 +420,18 @@ There were several customizations and visual integrations we hoped to accomplish
 1. We attempted to set the path ("tail") colors equal to the animated line, unique to each individual. It seems the package only allows a single parameter value for the tail color, but this is something we could explore further.
 2. There is a function in moveVis that allows animated maps to play side-by-side, which would create a useful visualization. There are some underlying steps to align the maps properly, and we simply ran out of time to attempt this mapping feature.
 3. Similarly, we wanted to combine the fox and cat movement paths into a single animated map, grouped by species. We encountered difficulties with this goal because the movestack data class can be difficult to manipulate. We have not determined if combining the data sets for a single animated map is impossible in the moveVis package, but we were not able to complete our attempt.
+
+
+###Citations
+Roshier DA, Carter A (2021) Data from: Space use and interactions of two introduced mesopredators, European red fox and feral cat, in an arid landscape. Movebank Data Repository. doi:10.5441/001/1.6m6h9s33
+
+Roshier DA, Carter A. 2021. Space use and interactions of two introduced mesopredators, European red fox and feral cat, in an arid landscape. Ecosphere. 12(7):e03628. doi:10.1002/ecs2.3628
+
+Schwalb-Willmann J, Remelgado R, Safi K, Wegmann M (2020). “moveVis: Animating movement trajectories in synchronicity with static or temporally dynamic environmental data in R.” Methods in Ecology and Evolution. doi:10.1111/2041-210X.13374.
+
+Signer J, Fieberg J, Avgar T (2019). “Animal movement tools (amt): R package for managing tracking data and conducting habitat selection analyses.” Ecology and Evolution, 9, 880–890. https://doi.org/10.1002/ece3.4823.
+
+Wickham H, Averick M, Bryan J, Chang W, McGowan LD, François R, Grolemund G, Hayes A, Henry L, Hester J, Kuhn M, Pedersen TL, Miller E, Bache SM, Müller K, Ooms J, Robinson D, Seidel DP, Spinu V, Takahashi K, Vaughan D, Wilke C, Woo K, Yutani H (2019). “Welcome to the tidyverse.” Journal of Open Source Software, 4(43), 1686. doi:10.21105/joss.01686.
+
+Graul, Christian (2016): leafletR: Interactive Web-Maps Based on the Leaflet JavaScript Library. R package version 0.4-0, http://cran.r-project.org/package=leafletR.
+
