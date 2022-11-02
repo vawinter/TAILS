@@ -329,7 +329,7 @@ view_spatial(mC, path_colours = col, render_as = "leaflet")
 
 ##Finally, animate the movement paths into a GIF
 
-```{r}
+```{r, eval=FALSE, echo=TRUE}
 # create spatial frames with a basemap 
 frames <- frames_spatial(mC, path_colours = col,
                          tail_colour = "white", tail_size = 0.8, #how to include tail
@@ -344,8 +344,13 @@ frames <- frames_spatial(mC, path_colours = col,
 
 frames[[100]] # preview one of the frames, e.g. the 100th frame
 
-animate_frames(frames, out_file = "catVis.gif", overwrite = TRUE)
+animate_frames(frames, out_file = "catVisFinal.gif", overwrite = TRUE)
 ```
+
+```{r, fig.cap="Movement of 5 individual cats from Aug. 2017 - Nov. 2017"}
+knitr::include_graphics("catVisFinal.gif")
+```
+
 
 ## Movetrack visualization: foxes
 We also created an interactive map of the fox locations and an animated path of the fox movement during the same time period as the cats.
@@ -393,7 +398,9 @@ colChoice <- brewer.pal(n = 9, name= 'Set1')
 
 # Display locations on interactive map
 view_spatial(moveFox, path_colours = colChoice)
+```
 
+```{r, eval=FALSE, echo=FALSE}
 # Create animated movement path
 framesFox <- frames_spatial(moveFox, path_colours = colChoice, # Can't figure out how to match tail colour to path colour by individual; error message indicates it's not possible
                             trace_show = TRUE, trace_colour = 'darkgrey',
@@ -406,6 +413,10 @@ framesFox <- frames_spatial(moveFox, path_colours = colChoice, # Can't figure ou
   add_progress()
   # %>% add_gg(gg = expr(list(xlim(c(140.0, 142.0)), ylim(c(-30.0, -34.0))))) # Can't figure out how to manually change the map extent; should be able to use add_gg() to call a ggplot2 function within moveVis
 animate_frames(framesFox, out_file = "foxVis.gif", overwrite = TRUE)
+```
+
+```{r, fig.cap="Movement of 9 individual foxes from Aug. 2017 - Nov. 2017"}
+knitr::include_graphics("foxVis.gif")
 ```
 
 ## Lessons Learned
