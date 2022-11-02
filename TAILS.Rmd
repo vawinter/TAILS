@@ -26,7 +26,7 @@ statistical analyses.
 ## Home ranges
 Although we wanted to largely stya away from statistics, some tools are a useful way to visualize differenes in the boundaries of areas being used by individuals.
 Here, we created minimum convex polygons (MCP) and kernel density estimators (KDE) for
-three cats and three foxes from August through November in 2017. We wanted to also see if the size of the area the individuals used differed.
+three cats and three foxes from August through November in 2017.
 
 ## Visualization 1a: Home ranges: Cats
 ```{r}
@@ -55,7 +55,7 @@ cat_check <- x %>%
   filter(animal.id %in% cat_choice$individual.local.identifier) 
 
 # visualize in table the cats per year
-table(x$animal.id, x$animal.sex, year(x$deploy.on.date))  
+# table(x$animal.id, x$animal.sex, year(x$deploy.on.date))  
 
 # Grab sex from reference data
 sex <- x %>% 
@@ -155,7 +155,6 @@ library(amt)
 # Read in data ----
 # fox data and reference
 x <- read.csv("Data/Red Fox (Vulpes vulpes) - Scotia, NSW, Australia-reference-data.csv")
-x
 fox <- read.csv("Data/Red Fox (Vulpes vulpes) - Scotia, NSW, Australia.csv")
 
 # Filter individuals in 2017 with greater than 600 data pints
@@ -170,7 +169,7 @@ fox_check <- x %>%
   filter(animal.id %in% fox_choice$individual.local.identifier) 
 
 # visualize in table
-table(x$animal.id, x$animal.sex, year(x$deploy.on.date))  
+# table(x$animal.id, x$animal.sex, year(x$deploy.on.date))  
 
 # Grab sex from reference data
 sex <- x %>% 
@@ -256,7 +255,9 @@ plot(fox_kde[[3]], main = "KDE: Joy", col = "brown3")
 
 
 ## Home range area comparison
-```{r}
+We wanted to also see if the size of the area the species used differed. Here are histogram plots of the area of MCP/KDE for each species. Looks like the cats use a larger area than foxes! Which is neat.
+
+```{r, echo = FALSE}
 hist(c_mcp_df$area, main = "MCP: Cat home range area distribution", col = "lightgreen",
      xlab = "Area")
 hist(c_kde_df$area, main = "KDE: Cat home range area distribution", col = "cyan",
@@ -351,6 +352,14 @@ We also created an interactive map of the fox locations and an animated path of 
 
 Notice that with the moveVis package we are able to customize point and line colors, and map imagery.
 ```{r, echo = FALSE}
+library(tidyverse)
+library(lubridate)
+library(move)
+library(moveVis)
+library(RColorBrewer)
+library(leaflet)
+
+
 # set up loin for movebank
 loginStored <- movebankLogin(username="mbstum", password="Cq6j9m4KrQRQGJ@")
 

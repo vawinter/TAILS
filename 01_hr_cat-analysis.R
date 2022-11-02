@@ -96,8 +96,8 @@ plot(cat_kde[[3]], main = "Ken")
 mcp_areas <- lapply(cat_mcp, hr_area)
 kde_areas <- lapply(cat_kde, hr_area)
 
-kde_df <- bind_rows(kde_areas, .id = "id")
-mcp_df <- bind_rows(mcp_areas, .id = "id")
+c_kde_df <- bind_rows(kde_areas, .id = "id")
+c_mcp_df <- bind_rows(mcp_areas, .id = "id")
 
 saveRDS(cat_kde, "DataVis/20221031_cat-kde.rds")
 saveRDS(kde_df, "DataVis/20221031_cat_hr-df.rds")
